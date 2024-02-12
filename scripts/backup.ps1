@@ -21,11 +21,6 @@ write-output $backupStoragePath
 
 Write-Output "Start Mirroring Working Directory"
 
-# /e	Copies subdirectories. This option automatically includes empty directories.
-
-# /zb	Copies files in restartable mode. If file access is denied, switches to backup mode.
-# /R:3 /W:60  2 retries and waiting 60 seconds between each retry
-# /MT:16 16 multi-threaded copy operation
 Robocopy $workingDirPath $backupStoragePath /MIR /R:3 /W:60 /E /ZB /MT:16 /LOG+:$copyLogFilePath
 
 
