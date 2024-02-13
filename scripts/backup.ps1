@@ -14,17 +14,29 @@ $slackToken = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($encrypt
 
 write-output $workingDirPath
 write-output $backupStoragePath
-# function Test-Script {
-#   param($Name,$Age)
-#   "$Name is roughly $Age years old"
-# }
+function Send-Slack-MSG {
+  param($message)
+  $url = 'https://slack.com/api/chat.postMessage'
+  $final_message = '[Backup Job] '+$message
+  $token = $slackToken 
+  $channel = 'working-space'
+  $body = @{color = "good"; token = $token; channel = $channel; text = $final_message; pretty = 1 }
+  Invoke-WebRequest -Uri $url -Method POST -Body $body
+}
 
 # Test-Script "The Doctor" "4.5 billion"
 # Test-Script -Name Mother -Age 29
 
 Write-Output "Start Mirroring Working Directory"
-# TODO: confirm can we access to the source directory or not
+# Confirm can we access to the source directory or not
+Set-Location $workingDirPath
 
+$errorFlag = $?
+if ( !$errorFlag )
+{
+    Write-Output "There are some problems with the source directory."
+    Send-Slack-MSG("There are some problems with the source directory.")
+}
 # TODO: confirm do we have the destination directory or not. If not, create one.
 
 # TODO: confirm do we have the log directory. If do not exist, create one.
