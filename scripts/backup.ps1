@@ -5,9 +5,14 @@ param (
     [Parameter(Mandatory=$true)][string]$workingDirPath,
     [Parameter(Mandatory=$true)][string]$backupStoragePath,
     [Parameter(Mandatory=$true)][string]$copyLogFilePath,
-    [Parameter(Mandatory=$true)][string]$slackToken,
+    [Parameter(Mandatory=$true)][Int64]$encryptedSlackToken,
     [string]$retentionDays = "1"
  )
+
+#$secString = ConvertTo-SecureString -AsPlainText -Force "xoxb-2265171893089-6629648182384-w7ra9EknWLuPZuklx275f2eV"
+#$BSTR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($secString)
+$slackToken = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($encryptedSlackToken)
+#[System.Runtime.InteropServices.Marshal]::PtrToStringAuto("1649842070648")
 
 write-output $workingDirPath
 write-output $backupStoragePath
@@ -26,7 +31,7 @@ Write-Output "Start Mirroring Working Directory"
 
 # TODO: confirm do we have the log directory. If do not exist, create one.
 
-Robocopy $workingDirPath $backupStoragePath /MIR /R:3 /W:60 /E /ZB /MT:16 /LOG+:$copyLogFilePath
+#Robocopy $workingDirPath $backupStoragePath /MIR /R:3 /W:60 /E /ZB /MT:16 /LOG+:$copyLogFilePath
 
 # TODO: what is the exit code of the above command?
 # TODO: If not good, sent alert.
