@@ -5,24 +5,27 @@ param (
     [Parameter(Mandatory=$true)][string]$workingDirPath,
     [Parameter(Mandatory=$true)][string]$backupStoragePath,
     [Parameter(Mandatory=$true)][string]$copyLogFilePath,
-    [Parameter(Mandatory=$true)][Int64]$encryptedSlackToken,
+    [Parameter(Mandatory=$true)][string]$encryptedSlackToken,
     [string]$retentionDays = "1"
  )
 
-
-$slackToken = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($encryptedSlackToken)
-
-write-output $workingDirPath
-write-output $backupStoragePath
 function Send-Slack-MSG {
   param($message)
   $url = 'https://slack.com/api/chat.postMessage'
   $final_message = '[Backup Job] '+$message
   $token = $slackToken 
   $channel = 'working-space'
-  $body = @{color = "good"; token = $token; channel = $channel; text = $final_message; pretty = 1 }
+  $body = @{ token = $token; channel = $channel; text = $final_message; pretty = 1 }
   Invoke-WebRequest -Uri $url -Method POST -Body $body
 }
+
+write-output $encryptedSlackToken
+[string]$slackToken = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($encryptedSlackToken))
+$slackToken = $slackToken -replace "\n",""
+
+write-output $workingDirPath
+write-output $backupStoragePath
+
 
 # Test-Script "The Doctor" "4.5 billion"
 # Test-Script -Name Mother -Age 29
