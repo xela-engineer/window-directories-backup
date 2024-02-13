@@ -9,10 +9,8 @@ param (
     [string]$retentionDays = "1"
  )
 
-#$secString = ConvertTo-SecureString -AsPlainText -Force "xoxb-2265171893089-6629648182384-w7ra9EknWLuPZuklx275f2eV"
-#$BSTR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($secString)
+
 $slackToken = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($encryptedSlackToken)
-#[System.Runtime.InteropServices.Marshal]::PtrToStringAuto("1649842070648")
 
 write-output $workingDirPath
 write-output $backupStoragePath
