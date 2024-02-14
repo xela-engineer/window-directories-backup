@@ -31,22 +31,32 @@ write-output $backupStoragePath
 # Test-Script -Name Mother -Age 29
 
 Write-Output "Start Mirroring Working Directory"
-# Confirm can we access to the source directory or not
-Set-Location $workingDirPath
-
-$errorFlag = $?
+# Confirm can we access to the source directory
+$errorFlag = Test-Path $workingDirPath
 if ( !$errorFlag )
 {
-    Write-Output "There are some problems with the source directory."
-    Send-Slack-MSG("There are some problems with the source directory.")
+    Send-Slack-MSG("Fail to accessing the source directory.")
+    exit 1
 }
-# TODO: confirm do we have the destination directory or not. If not, create one.
-
-# TODO: confirm do we have the log directory. If do not exist, create one.
+# Confirm do we can access to destination directory
+$errorFlag = Test-Path $backupStoragePath
+if ( !$errorFlag )
+{
+    Send-Slack-MSG("Fail to accessing the destination directory.")
+    exit 1
+}
+# confirm do we have the log directory.
+$errorFlag = Test-Path $copyLogFilePath
+if ( !$errorFlag )
+{
+    Send-Slack-MSG("Fail to accessing the LogFile.")
+    exit 1
+}
 
 #Robocopy $workingDirPath $backupStoragePath /MIR /R:3 /W:60 /E /ZB /MT:16 /LOG+:$copyLogFilePath
 
 # TODO: what is the exit code of the above command?
+$RobocopyReturnCode = $?
 # TODO: If not good, sent alert.
 
 $url = 'https://slack.com/api/chat.postMessage'
