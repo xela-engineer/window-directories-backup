@@ -12,10 +12,11 @@ param (
 function Send-Slack-MSG {
   param($message)
   $url = 'https://slack.com/api/chat.postMessage'
+  $title = '[Backup Job]'
   $final_message = '[Backup Job] '+$message
   $token = $slackToken 
   $channel = 'working-space'
-  $body = @{ token = $token; channel = $channel; text = $final_message; pretty = 1 }
+  $body = @{ token = $token; channel = $channel; title = $title ; text = $final_message; pretty = 1 }
   Invoke-WebRequest -Uri $url -Method POST -Body $body
 }
 
@@ -56,7 +57,9 @@ if ( !$errorFlag )
 #Robocopy $workingDirPath $backupStoragePath /MIR /R:3 /W:60 /E /ZB /MT:16 /LOG+:$copyLogFilePath
 
 # TODO: what is the exit code of the above command?
-$RobocopyReturnCode = $?
+if ( $LASTEXITCODE -ne 0) {
+    Throw "Something bad happened while executing $command. Details: $($result | Out-String)"
+}
 # TODO: If not good, sent alert.
 
 $url = 'https://slack.com/api/chat.postMessage'
