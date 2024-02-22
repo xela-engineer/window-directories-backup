@@ -13,11 +13,31 @@ function Send-Slack-MSG {
   param($message)
   $url = 'https://slack.com/api/chat.postMessage'
   $title = '[Backup Job]'
-  $final_message = '[Backup Job] '+$message
+  #$final_message = '[Backup Job] '+$message
   $token = $slackToken 
   $channel = 'working-space'
-  $body = @{ token = $token; channel = $channel; title = $title ; text = $final_message; pretty = 1 }
-  Invoke-WebRequest -Uri $url -Method POST -Body $body
+  $body = @{ channel = $channel; attachments= @(    
+    @{                    
+        fallback =  "A plaintext message" #$Fallback
+        color = "danger" #$Color
+        pretext = "Attention" #$title #$Pretext
+        #author_name = "Alex" #$AuthorName
+        #author_link = 'http://ramblingcookiemonster.github.io/images/tools/wrench.png' #$AuthorLink
+        #author_icon = 'http://ramblingcookiemonster.github.io/images/tools/wrench.png' #$AuthorIcon
+        title = $title
+        title_link = 'https://www.youtube.com/' #$TitleLink
+        text = $message
+        #fields = $Fields #Fields are defined by the user as an Array of HashTables.
+        #image_url = $ImageURL
+        #thumb_url = $ThumbURL
+       
+    }) }
+
+  $json = $body | ConvertTo-Json -Depth 4
+  $json = [regex]::replace($json,'\\u[a-fA-F0-9]{4}',{[char]::ConvertFromUtf32(($args[0].Value -replace '\\u','0x'))})
+  $json = $json -replace "\\\\", "\"
+  $headers = @{Authorization = "Bearer $token"}
+  Invoke-WebRequest -Uri $url -Method POST -Body $json -ContentType 'application/json; charset=utf-8' -Headers $headers
 }
 
 write-output $encryptedSlackToken
